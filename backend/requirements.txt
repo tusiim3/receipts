@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+google-generativeai
+google-auth
+google-auth-oauthlib
+google-api-python-client
+firebase-admin
+openai
+httpx
+beautifulsoup4
+python-multipart
+pypdf2
+pillow
+python-dotenv
+pydantic
