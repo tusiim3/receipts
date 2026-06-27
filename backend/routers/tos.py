@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from PyPDF2 import PdfReader
 
 from models.schemas import TosAnalysisRequest, TosFlag
-from services import firestore_service, gemini_service
+from services import supabase_service, gemini_service
 from services.auth_service import get_current_user
 
 router = APIRouter(prefix="/tos", tags=["tos"])
@@ -38,7 +38,7 @@ def _save_and_return(uid: str, flags: list[dict], source: str):
         "source": source,
         "analyzed_at": analyzed_at,
     }
-    analysis_id = firestore_service.save_tos_analysis(uid, analysis)
+    analysis_id = supabase_service.save_tos_analysis(uid, analysis)
 
     return {
         "id": analysis_id,

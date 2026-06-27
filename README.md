@@ -27,8 +27,8 @@ The dashboard pulls together everything from Gmail scans and ToS analyses:
 |---|---|
 | Frontend | React (Vite), TailwindCSS |
 | Backend | FastAPI (Python) |
-| Database | Firestore |
-| Auth | Firebase Authentication |
+| Database | Supabase (PostgreSQL) |
+| Auth | Supabase Authentication |
 | AI | Gemini 1.5 Pro, Featherless AI (Mistral-7B) |
 | Email | Gmail API (OAuth 2.0, read-only) |
 
@@ -37,6 +37,7 @@ The dashboard pulls together everything from Gmail scans and ToS analyses:
 ```
 ├── frontend/          React app (auth, dashboard, Gmail, ToS, intelligence)
 ├── backend/           FastAPI API (routers, services, models)
+├── supabase/          Database schema (run in Supabase SQL Editor)
 ├── docker-compose.yml Local development with Docker
 └── deploy.sh          Cloud Run deployment (WIP)
 ```

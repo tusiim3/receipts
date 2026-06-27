@@ -4,7 +4,7 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException
 
 from models.schemas import AlternativesRequest, SentimentRequest
-from services import firestore_service, gemini_service
+from services import supabase_service, gemini_service
 from services.auth_service import get_current_user
 
 router = APIRouter(prefix="/intelligence", tags=["intelligence"])
@@ -99,8 +99,8 @@ def _compute_wasteful_flags(subscriptions: list[dict], tos_analyses: list[dict])
 @router.get("/summary")
 async def get_summary(user: dict = Depends(get_current_user)):
     uid = user["uid"]
-    subscriptions = firestore_service.get_subscriptions(uid)
-    tos_analyses = firestore_service.get_tos_analyses(uid)
+    subscriptions = supabase_service.get_subscriptions(uid)
+    tos_analyses = supabase_service.get_tos_analyses(uid)
 
     total_monthly = sum(
         _normalize_to_monthly(sub.get("amount"), sub.get("frequency", "unknown"))

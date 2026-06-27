@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { auth } from '../../firebase'
+import { supabase } from '../../supabase'
 import api from '../../api'
 import Layout from '../Layout'
 import SubscriptionCard from '../dashboard/SubscriptionCard'
@@ -46,7 +46,12 @@ export default function GmailConnect() {
   const handleConnect = async () => {
     setError('')
     try {
-      const token = await auth.currentUser.getIdToken()
+      const { data: { session } } = await supabase.auth.getSession()
+      const token = session?.access_token
+      if (!token) {
+        setError('Not authenticated')
+        return
+      }
       const apiBase = import.meta.env.VITE_API_BASE_URL
       window.location.href = `${apiBase}/auth/gmail?token=${token}`
     } catch (err) {

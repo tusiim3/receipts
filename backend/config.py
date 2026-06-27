@@ -13,8 +13,9 @@ GMAIL_CLIENT_SECRET = os.getenv("GMAIL_CLIENT_SECRET", "")
 GMAIL_REDIRECT_URI = os.getenv("GMAIL_REDIRECT_URI", "http://localhost:8000/auth/gmail/callback")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 FEATHERLESS_API_KEY = os.getenv("FEATHERLESS_API_KEY", "")
-FIREBASE_PROJECT_ID = os.getenv("FIREBASE_PROJECT_ID", "")
-FIREBASE_STORAGE_BUCKET = os.getenv("FIREBASE_STORAGE_BUCKET", "")
+SUPABASE_URL = os.getenv("SUPABASE_URL", "")
+SUPABASE_SERVICE_ROLE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")
+SUPABASE_JWT_SECRET = os.getenv("SUPABASE_JWT_SECRET", "")
 
 
 def parse_json_response(text: str) -> Any:

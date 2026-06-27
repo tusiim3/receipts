@@ -10,7 +10,7 @@ from google_auth_oauthlib.flow import Flow
 from googleapiclient.discovery import build
 
 from config import GMAIL_CLIENT_ID, GMAIL_CLIENT_SECRET, GMAIL_REDIRECT_URI
-from services import firestore_service
+from services import supabase_service
 
 SCOPES = ["https://www.googleapis.com/auth/gmail.readonly"]
 
@@ -87,14 +87,14 @@ def _build_credentials(token_data: dict) -> Credentials:
 
 
 def get_gmail_service(uid: str):
-    token_data = firestore_service.get_gmail_tokens(uid)
+    token_data = supabase_service.get_gmail_tokens(uid)
     if not token_data:
         raise ValueError("Gmail not connected")
 
     creds = _build_credentials(token_data)
 
     if creds.token != token_data.get("token"):
-        firestore_service.save_gmail_tokens(uid, {
+        supabase_service.save_gmail_tokens(uid, {
             **token_data,
             "token": creds.token,
             "expiry": creds.expiry.isoformat() if creds.expiry else None,

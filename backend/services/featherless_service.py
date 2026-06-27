@@ -1,7 +1,7 @@
 from openai import OpenAI
 
 from config import FEATHERLESS_API_KEY
-from services import firestore_service
+from services import supabase_service
 
 FEATHERLESS_BASE_URL = "https://api.featherless.ai/v1"
 MODEL = "Mistral-7B-Instruct"
@@ -25,7 +25,7 @@ def _get_client() -> OpenAI:
 
 
 def categorize(service_name: str) -> str:
-    cached = firestore_service.get_cached_category(service_name)
+    cached = supabase_service.get_cached_category(service_name)
     if cached:
         return cached
 
@@ -40,5 +40,5 @@ def categorize(service_name: str) -> str:
     if category not in VALID_CATEGORIES:
         category = "other"
 
-    firestore_service.cache_category(service_name, category)
+    supabase_service.cache_category(service_name, category)
     return category

@@ -5,8 +5,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import RedirectResponse
 
 from config import FRONTEND_URL
-from services import firestore_service, gemini_service
-from services.auth_service import get_current_user, verify_firebase_token
+from services import supabase_service, gemini_service
+from services.auth_service import get_current_user, verify_supabase_token
 from services import gmail_service, featherless_service
 
 router = APIRouter(tags=["gmail"])
@@ -17,12 +17,12 @@ _oauth_states: dict[str, str] = {}
 @router.get("/auth/gmail")
 async def gmail_auth(token: str = Query(...)):
     try:
-        decoded = verify_firebase_token(token)
+        decoded = verify_supabase_token(token)
         uid = decoded["uid"]
     except Exception:
         raise HTTPException(status_code=401, detail={
             "error": True,
-            "message": "Invalid Firebase token",
+            "message": "Invalid auth token",
             "code": "UNAUTHORIZED",
         })
 
@@ -41,7 +41,7 @@ async def gmail_callback(code: str = Query(...), state: str = Query(...)):
 
     try:
         tokens = gmail_service.exchange_code_for_tokens(code, state)
-        firestore_service.save_gmail_tokens(uid, tokens)
+        supabase_service.save_gmail_tokens(uid, tokens)
     except Exception as e:
         return RedirectResponse(url=f"{FRONTEND_URL}/gmail?error={str(e)}")
 
@@ -106,7 +106,7 @@ async def scan_gmail(user: dict = Depends(get_current_user)):
         except Exception:
             sub["category"] = "other"
 
-    firestore_service.save_subscriptions(uid, subscriptions)
+    supabase_service.save_subscriptions(uid, subscriptions)
 
     unique_services = len(set(s.get("service_name", "").lower() for s in subscriptions))
 

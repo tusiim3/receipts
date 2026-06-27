@@ -1,13 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react'
-import {
-  onAuthStateChanged,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  signInWithPopup,
-  GoogleAuthProvider,
-  signOut,
-} from 'firebase/auth'
-import { auth } from '../firebase'
+import { supabase } from '../supabase'
 import api from '../api'
 
 const AuthContext = createContext(null)
@@ -17,24 +9,43 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      setUser(firebaseUser)
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null)
       setLoading(false)
-      if (firebaseUser) {
-        try {
-          await api.post('/auth/register')
-        } catch {
-          // User doc may already exist
-        }
+      if (session?.user) {
+        api.post('/auth/register').catch(() => {})
       }
     })
-    return unsubscribe
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null)
+      if (session?.user) {
+        api.post('/auth/register').catch(() => {})
+      }
+    })
+
+    return () => subscription.unsubscribe()
   }, [])
 
-  const login = (email, password) => signInWithEmailAndPassword(auth, email, password)
-  const signup = (email, password) => createUserWithEmailAndPassword(auth, email, password)
-  const loginWithGoogle = () => signInWithPopup(auth, new GoogleAuthProvider())
-  const logout = () => signOut(auth)
+  const login = async (email, password) => {
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    if (error) throw error
+  }
+
+  const signup = async (email, password) => {
+    const { error } = await supabase.auth.signUp({ email, password })
+    if (error) throw error
+  }
+
+  const loginWithGoogle = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: `${window.location.origin}/dashboard` },
+    })
+    if (error) throw error
+  }
+
+  const logout = () => supabase.auth.signOut()
 
   return (
     <AuthContext.Provider value={{ user, loading, login, signup, loginWithGoogle, logout }}>
