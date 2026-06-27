@@ -6,3 +6,4 @@ frontend/dist/
 __pycache__/
 *.pyc
 .venv/
+cursor_prompt.md
